@@ -4,6 +4,7 @@ abstract class MFEF_Field {
 	protected $label;
 	protected $id;
 	protected $type;
+	protected $classes;
 	/* protected $options;
 	protected $required;
 	protected $default;
@@ -11,9 +12,35 @@ abstract class MFEF_Field {
 	protected $value;
 	 */
 	 
+	 public function __construct( $field_options ) {
+			
+		$defaults = array(
+			'id'	=>	'',
+			'label'	=>	'',
+			'classes'	=>	array(),
+		);
+		
+		$field_options = array_merge( $defaults, $field_options );
+		
+		if ( $field_options['id'] != '' ) {
+			$this->id = $field_options['id'];
+		} else {
+			return null;
+		}
+		
+		$this->label = $field_options['label'];
+		$this->type = $field_options['type'];
+		$this->classes = $field_options['classes'];
+		
+		$this->classes[] = 'mfef-field';
+		$this->classes[] = 'mfef-field-' . esc_attr($this->id);
+		
+	}
+	 
 	
 	abstract protected function render_field();
 	abstract public function sanitize( $value );
+	abstract public function validate();
 	
 	public function render(  ) {
 		/* if ( $value == null ) {
@@ -23,36 +50,17 @@ abstract class MFEF_Field {
 		 }
 		*/
 		?>
-		<label for="<?php echo esc_attr($this->id); ?>"><?php echo esc_attr($this->label); ?></label>
+		<div class="<?php echo implode(' ', $this->classes); ?>">
+		<label for="<?php echo esc_attr($this->id); ?>" class="label-<?php echo esc_attr($this->id); ?>"><?php echo esc_attr($this->label); ?></label>
 		<?php
 		
 		$this->render_field();	
-			
+		
+		?>
+		</div>
+		<?php
 	}
 	
-	
-	
-	protected function render_select() {
-		
-	}
-	
-	protected function render_textarea() {
-		
-		
-		
-	}
-	
-	protected function render_radio() {
-	}
-	
-	protected function render_text() {
-		
-	}
-
-	protected function render_repeater() {
-	
-		
-	}
 
 	/**
 	 * Magic __get function to dispatch a call to retrieve a private property

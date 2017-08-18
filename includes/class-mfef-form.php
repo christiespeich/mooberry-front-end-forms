@@ -8,63 +8,117 @@ abstract class MFEF_Form {
 	protected $class;
 	protected $values;
 	protected $id;
-	
-	
-	/* public function __construct( $options_key, $action ) {
-		$this->options_key = $options_key;
-		$this->action = $action;
-		$this->fields = array();
-		$this->class = '';
-		$this->values = get_option( $options_key, array() );
+	protected $redirect_after_save;
+	protected $capability;
+	protected $item_id;
+	protected $nonce_field;
+	protected $nonce_value;
+	protected $button_name;
+	protected $button_value;
+	protected $button_text;
+	protected $save_callback;
 		
 		
-	} */
+	abstract protected function save_fields( $fields );
 	
-	abstract protected function save( $fields );
+	 public function __construct( $id, $options = null, $capability = null) {
+		 
+		 $this->capability = $capability;
+		 $access = $this->check_capability();
+		 if ( !$access ) {
+			 
+			 echo
+					'<h3>' . __( 'Access Denied' ) . '</h3>' .
+					'<p>' . __( 'Sorry, you do not have access.', 'mooberry-front-end-forms' ) . '</p>';
+			return;
+		 }
+		 
+		$defaults = array(
+			'redirect_after_save'	=>	'',
+			'nonce_field'	=>	$id,
+			'nonce_value'	=>	$id . '-front-end',
+			'button_name'	=> '',
+			'button_value'	=>	'',
+			'button_text'	=>	__('Save', 'mooberry-front-end-forms'),
+			'save_callback'	=>	'',
+		);
+		
+		$options = array_merge( $defaults, $options );
+		
+		$this->id = $id;
+		$this->nonce_field = $options['nonce_field'];
+		$this->nonce_value = $options['nonce_value'];
+		$this->button_name = $options['button_name'];
+		$this->button_value = $options['button_value'];
+		$this->button_text	= $options['button_text'];
+		$this->save_callback = $options['save_callback'];
+		
+		$this->redirect_after_save = $options['redirect_after_save'];
+		
+		
+		
+	} 
+	
+	protected function check_capability() {
+		if ( $this->capability != null ) {
+			return current_user_can( $this->capability, $this->item_id );
+		} else {
+			return true;
+		}
+	}
+		
 	
 	public function add_field( $field_options ) {
-		
-		if ( array_key_exists( $field_options['id'], $this->values ) ) {
-			$field_options['value']  = $this->values[ $field_options['id'] ];
-		}
-		$new_field = MFEF_Field_Factory::create_field( $field_options );
-		
-		if ( $new_field != null ) {
-			$this->fields[] = $new_field;
-		}		
+		$access = $this->check_capability();
+		 if ( $access ) {
+			 
+			if ( array_key_exists( $field_options['id'], $this->values ) ) {
+				$field_options['value']  = $this->values[ $field_options['id'] ];
+				
+			}
+			$new_field = MFEF_Field_Factory::create_field( $field_options );
+			
+			if ( $new_field != null ) {
+				$this->fields[] = $new_field;
+			}		
+		 }
 	}
 	
 	public function render() {
-		 // ob_start();
-		  
-		 
-		// $content = ob_get_contents();
-        // ob_end_clean();
+		$access = $this->check_capability();
+		 if ( $access ) {
+			 
+			 // ob_start();
+			  
+			 
+			// $content = ob_get_contents();
+			// ob_end_clean();
 
-        // return $content;
-		$this->process_form();
-		
-		if ( $this->contains_repeater() ) {
-			$this->class .= ' repeater ';
-		}
-	
-		?>
-		<form id="<?php echo esc_attr($this->id); ?>" class="<?php echo esc_attr($this->class); ?>" action="" method="post">
-			<?php
-			foreach ( $this->fields as $field ) {
-				/* $value = null;
-				if ( array_key_exists( $field->id, $this->values ) ) {
-					$value = $this->values[ $field->id ];
-				} */
-				$field->render(  );
+			// return $content;
+			$this->process_form();
+			
+			if ( $this->contains_repeater() ) {
+				$this->class .= ' repeater ';
 			}
 		
-			 wp_nonce_field( $this->options_key , $this->options_key . '-front-end'); 
-				?>
+			?>
+			<form id="<?php echo esc_attr($this->id); ?>" class="<?php echo esc_attr($this->class); ?> mfef-form mfef-form-<?php echo esc_attr($this->id); ?>" action="" method="post">
+				<?php
+				foreach ( $this->fields as $field ) {
+					/* $value = null;
+					if ( array_key_exists( $field->id, $this->values ) ) {
+						$value = $this->values[ $field->id ];
+					} */
+					$field->render(  );
+				}
 			
-			<input type="submit" value="Save">	
-		</form>
-		<?php
+				 wp_nonce_field( $this->nonce_field , $this->nonce_value); 
+					?>
+				
+				<button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next"><?php echo esc_html($this->button_text); ?></button>	
+			</form>
+			<?php
+		 }
 	}
 	
 	protected function contains_repeater() {
@@ -77,35 +131,58 @@ abstract class MFEF_Form {
 	}
 	
 	protected function process_form() {
-		if (isset($_POST[$this->options_key . '-front-end']) ) {
-			if (wp_verify_nonce($_POST[ $this->options_key . '-front-end'], $this->options_key)){ 
-				// save form
-				
-				// sanitize the fields 
-				$clean_fields = array();
-				foreach ( $this->fields as $field ) {
-					if ( array_key_exists( $field->id, $_POST ) ) {
-						$clean_fields[ $field->id ] = $field->sanitize( $_POST[ $field->id ] );
+		$access = $this->check_capability();
+		 if ( $access ) {
+			 
+			if (isset($_POST[$this->id . '-front-end']) ) {
+				if (wp_verify_nonce($_POST[ $this->id . '-front-end'], $this->id)){ 
+					// save form
+					
+					$clean_fields = array();
+					$message = array();
+					foreach ( $this->fields as $field ) {
+						
+						if ( array_key_exists( $field->id, $_POST ) ) {
+							// sanitize the fields 
+							
+							$clean_fields[ $field->id ] = $field->sanitize( $_POST[ $field->id ] );
+							
+							// validate the fields
+							$result = $field->validate();
+							
+							if ( is_wp_error($result) )  {
+								//$field->classes[] = 'missing';
+								
+									$message[] = $result->get_error_message();
+								
+							}
+						
+						}
 					}
+					
+					if ( count($message) == 0 ) {
+						// save the form
+						$success = $this->save( $clean_fields );
+						//$options = $this->sanitize_fields( $this->fields, $_POST );
+						
+						
+						// set values so that form can be populated with values
+					//	$this->values = $clean_fields;
+						
+					} else {
+						echo '<p>' . implode('</p><p>', $message) . '</p>';
+					}
+				} else {
+					echo 'Update Failed!';
 				}
-				
-				// save the form
-				$this->save( $clean_fields );
-				//$options = $this->sanitize_fields( $this->fields, $_POST );
-				
-				
-				// set values so that form can be populated with values
-				$this->values = $clean_fields;
-				echo 'Saved!';
-			} else {
-				echo 'Update Failed!';
 			}
-		}
+		 }
 	}
 	
 	
 	
 	private function sanitize_fields( $fields, $post_data ) {
+		
 		$sanitized_fields = array();
 		
 		foreach ( $fields as $field ) {
@@ -133,6 +210,27 @@ abstract class MFEF_Form {
 		return $sanitized_fields;
 	}
 	
+	
+	protected function save( $fields ) {
+		if ( $this->check_capability() ) {
+			do_action('mfef_pre_save', $this, $fields );
+			$success = $this->save_fields( $fields );
+			do_action('mfef_post_save_pre_callback', $this, $fields );
+			if ( $this->save_callback != ''  ) {
+				if ( function_exists( $this->save_callback) ) {
+					call_user_func ( $this->save_callback,  $this, $fields  );
+				}
+			}
+			do_action('mfef_post_save_post_callback', $this, $fields );
+			if ( $success &&  $this->redirect_after_save != '' ) {
+				do_action('mfef_post_save_pre_redirect', $this, $fields);
+				wp_safe_redirect( $this->redirect_after_save );
+				exit();
+			}
+		}
+	}
+	
+
 	
 	/**
 	 * Magic __get function to dispatch a call to retrieve a private property

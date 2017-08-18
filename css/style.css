@@ -1,0 +1,65 @@
+.missing label {
+	color: red;
+}
+
+.required label::before {
+	content: ' * ';
+	color: red;
+}
+
+.repeater-item {
+    margin-bottom: 10px;
+	margin-left: 5%;
+}
+
+
+.repeater-item > div {
+    display: inline;
+}
+
+.repeater-delete-button {
+    background: url(../assets/delete.png) center;
+    height: 1.75em;
+    border: none;
+    width: 1.75em;
+    padding: 0.4em;
+}
+
+.mfef-field-repeater > label {
+    font-size: 1.2em;
+	margin-top: 10px;
+}
+
+.mfef-form button[type="submit"] {
+    margin-top: 20px;
+	float: none;
+	display: block;
+	clear: both;
+}
+
+.repeater-add-button {
+    margin-left: 20px;
+}
+
+div.mfef-field-checkbox ul li label {
+    font-weight: normal;
+}
+
+.mfef-field-checkbox > label {
+	float: left;
+}
+
+.mfef-field-checkbox > ul {
+	float: left;
+	list-style: none;
+	padding-left: 0;
+}
+
+.mfef-field.mfef-field-repeater label {
+    width: 26%;
+}
+
+.mfef-field.mfef-field-hidden > label {
+    width: initial;
+}
+

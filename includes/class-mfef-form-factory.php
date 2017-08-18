@@ -15,6 +15,9 @@ class MFEF_Form_Factory {
 			case 'option':
 				$form = new MFEF_Option_Form( $id, $options );
 				break;
+			case 'custom':
+				$form = new MFEF_Custom_Form( $id, $options );
+				break;
 		}
 		
 		return $form;

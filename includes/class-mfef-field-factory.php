@@ -28,6 +28,15 @@ class MFEF_Field_Factory {
 			case 'text':
 				$field = new MFEF_Text_Field( $options );
 				break;
+			case 'hidden':
+				$field = new MFEF_Hidden_Field( $options );
+				break;
+			case 'checkbox':
+				$field = new MFEF_Checkbox_Field( $options );
+				break;
+			case 'wysiwyg':
+				$field = new MFEF_WYSIWYG_Field( $options );
+				break;
 			
 		}
 		return $field;

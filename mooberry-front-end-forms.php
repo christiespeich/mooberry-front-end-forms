@@ -40,14 +40,36 @@ if ( ! defined( 'MFEF_PLUGIN_FILE' ) ) {
 
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-form-factory.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-form.php';
-//require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-user-form.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-user-form.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-option-form.php';
-//require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-post-form.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-post-form.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-custom-form.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-field-factory.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-single-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-text-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-wysiwyg-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-select-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-checkbox-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-textarea-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-radio-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-repeater-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-hidden-field.php';
+
+add_action( 'wp_enqueue_scripts', 'mfef_enqueue_scripts' );
+add_action( 'login_enqueue_scripts', 'mfef_enqueue_scripts');
+function mfef_enqueue_scripts() {
+	wp_enqueue_script( 'jquery-repeater', MFEF_PLUGIN_URL . '/js/jquery.repeater/jquery.repeater.js', array( 'jquery' ), MFEF_PLUGIN_VERSION,true );
+	wp_enqueue_script( 'repeater', MFEF_PLUGIN_URL . '/js/repeater.js', array( 'jquery' ),MFEF_PLUGIN_VERSION,true );
+	
+	wp_enqueue_style( 'mfef', MFEF_PLUGIN_URL . '/css/style.css' );
+}
+
+
+
+function mfef_get_unique_id() {
+
+	return uniqid('', true);
+		
+}
+
