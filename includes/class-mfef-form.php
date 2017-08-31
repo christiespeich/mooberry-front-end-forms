@@ -16,6 +16,7 @@ abstract class MFEF_Form {
 	protected $button_name;
 	protected $button_value;
 	protected $button_text;
+	protected $button_classes;
 	protected $save_callback;
 		
 		
@@ -40,6 +41,7 @@ abstract class MFEF_Form {
 			'button_name'	=> '',
 			'button_value'	=>	'',
 			'button_text'	=>	__('Save', 'mooberry-front-end-forms'),
+			'button_classes'	=>	array(),
 			'save_callback'	=>	'',
 		);
 		
@@ -51,6 +53,7 @@ abstract class MFEF_Form {
 		$this->button_name = $options['button_name'];
 		$this->button_value = $options['button_value'];
 		$this->button_text	= $options['button_text'];
+		$this->button_classes = $options['button_classes'];
 		$this->save_callback = $options['save_callback'];
 		
 		$this->redirect_after_save = $options['redirect_after_save'];
@@ -115,7 +118,7 @@ abstract class MFEF_Form {
 				 wp_nonce_field( $this->nonce_field , $this->nonce_value); 
 					?>
 				
-				<button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next"><?php echo esc_html($this->button_text); ?></button>	
+				<button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html($this->button_text); ?></button>	
 			</form>
 			<?php
 		 }
@@ -131,11 +134,12 @@ abstract class MFEF_Form {
 	}
 	
 	protected function process_form() {
+		
 		$access = $this->check_capability();
 		 if ( $access ) {
 			 
-			if (isset($_POST[$this->id . '-front-end']) ) {
-				if (wp_verify_nonce($_POST[ $this->id . '-front-end'], $this->id)){ 
+			if (isset($_POST[$this->nonce_value]) ) {
+				if (wp_verify_nonce($_POST[ $this->nonce_value], $this->nonce_field)){ 
 					// save form
 					
 					$clean_fields = array();
@@ -217,7 +221,7 @@ abstract class MFEF_Form {
 			$success = $this->save_fields( $fields );
 			do_action('mfef_post_save_pre_callback', $this, $fields );
 			if ( $this->save_callback != ''  ) {
-				if ( function_exists( $this->save_callback) ) {
+				if ( is_callable( $this->save_callback) ) {
 					call_user_func ( $this->save_callback,  $this, $fields  );
 				}
 			}
