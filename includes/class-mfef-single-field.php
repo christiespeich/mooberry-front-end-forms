@@ -51,7 +51,7 @@ abstract class MFEF_Single_Field extends MFEF_Field {
 		}
 		
 		if ( $this->validation_callback != '' ) {
-			if ( function_exists( $this->validation_callback ) ) {
+			if ( is_callable( $this->validation_callback ) ) {
 				$result = call_user_func( $this->validation_callback, $this );
 				if ( is_wp_error( $result ) ) {
 					return $result;

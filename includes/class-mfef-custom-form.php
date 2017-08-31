@@ -23,12 +23,14 @@ class MFEF_Custom_Form extends MFEF_Form {
 		$this->item_id = $options['item_id'];
 		
 		
-		
-		if ( $this->load_callback != '' && function_exists( $this->load_callback ) ) {
+	
+		if ( $this->load_callback != '' && is_callable( $this->load_callback ) ) {
 			$this->values = call_user_func( $this->load_callback, $this->item_id );
 		} else {
 			$this->values = array();
 		}
+		
+	
 	}
 	
 	protected function save_fields( $fields ) {
