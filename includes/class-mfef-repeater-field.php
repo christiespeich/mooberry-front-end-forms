@@ -5,6 +5,7 @@ class MFEF_Repeater_Field extends MFEF_Field {
 	protected $values;
 	protected $add_text;
 	protected $delete_text;
+	protected $add_button_classes;
 	
 	public function __construct( $field_options ) {
 		
@@ -16,6 +17,7 @@ class MFEF_Repeater_Field extends MFEF_Field {
 			'value'		=> array(),
 			'add_text'	=>	__('Add', 'mooberry-front-end-forms'),
 			'delete_text'	=>	__('Delete', 'mooberry-front-end-forms'),
+			'add_button_classes'	=>	array(),
 		);
 		
 		$field_options = array_merge( $defaults, $field_options );
@@ -40,6 +42,7 @@ class MFEF_Repeater_Field extends MFEF_Field {
 		$this->classes[] = 'mfef-field-repeater';
 		$this->add_text = $field_options[ 'add_text' ];
 		$this->delete_text = $field_options[ 'delete_text' ];
+		$this->add_button_classes = $field_options['add_button_classes'];
 		
 		
 	}
@@ -85,12 +88,12 @@ class MFEF_Repeater_Field extends MFEF_Field {
 	  
 	  ?>
 		</div>
-		<input data-repeater-create type="button" value="<?php echo esc_attr($this->add_text); ?>" class="btn btn-primary btn-sm repeater-add-button repeater-add-button-<?php echo esc_attr($this->id); ?>"/>
+		<input data-repeater-create type="button" value="<?php echo esc_attr($this->add_text); ?>" class="btn btn-primary btn-sm repeater-add-button repeater-add-button-<?php echo esc_attr($this->id); ?> <?php echo implode(' ', $this->add_button_classes); ?>"/>
 		<?php
 	}
 	
 	public function sanitize( $values ) {
-	
+	print_r2('saniztize repeart');
 		$sanitized_values = array();
 		foreach ( $values as $row ) {
 			$sanitized_fields = array();
