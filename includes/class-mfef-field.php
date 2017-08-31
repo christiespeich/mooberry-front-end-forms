@@ -5,6 +5,7 @@ abstract class MFEF_Field {
 	protected $id;
 	protected $type;
 	protected $classes;
+	protected $description;
 	/* protected $options;
 	protected $required;
 	protected $default;
@@ -18,6 +19,7 @@ abstract class MFEF_Field {
 			'id'	=>	'',
 			'label'	=>	'',
 			'classes'	=>	array(),
+			'desc'	=>	'',
 		);
 		
 		$field_options = array_merge( $defaults, $field_options );
@@ -31,6 +33,7 @@ abstract class MFEF_Field {
 		$this->label = $field_options['label'];
 		$this->type = $field_options['type'];
 		$this->classes = $field_options['classes'];
+		$this->description = $field_options['desc'];
 		
 		$this->classes[] = 'mfef-field';
 		$this->classes[] = 'mfef-field-' . esc_attr($this->id);
@@ -52,6 +55,9 @@ abstract class MFEF_Field {
 		?>
 		<div class="<?php echo implode(' ', $this->classes); ?>">
 		<label for="<?php echo esc_attr($this->id); ?>" class="label-<?php echo esc_attr($this->id); ?>"><?php echo esc_attr($this->label); ?></label>
+		<?php if ( $this->description != '' ) { ?>
+			<div class="mfef-field-description mfef-field-<?php echo esc_attr($this->id); ?>-description"><?php echo $this->description; ?></div>
+		<?php } ?>
 		<?php
 		
 		$this->render_field();	
