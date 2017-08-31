@@ -14,7 +14,7 @@ class MFEF_User_Form extends MFEF_Form {
 		
 		$this->item_id = $options['user_id'];
 		
-		$access = ls_edit_permission_check( $this->item_id );
+		$access = $this->edit_permission_check( $this->item_id );
 		if ( !$access ) {
 			echo
 					'<h3>' . __( 'Access Denied' ) . '</h3>' .
@@ -73,7 +73,7 @@ class MFEF_User_Form extends MFEF_Form {
 	protected function save_fields( $fields ) {
 		
 			$this->item_id = $fields['ID'];
-			$access = ls_edit_permission_check( $this->item_id );
+			$access = $this->edit_permission_check( $this->item_id );
 			if ( !$access ) {
 				echo
 						'<h3>' . __( 'Access Denied' ) . '</h3>' .
@@ -140,5 +140,23 @@ class MFEF_User_Form extends MFEF_Form {
 	}
 	
 	
+	protected function edit_permission_check( $profileuser_id) {
+		// global $current_user, $profileuser;
+	  
+		
+	   
+		$current_user = wp_get_current_user();
+	   // get_currentuserinfo();
+	 
+		if( ! is_super_admin( $current_user->ID )  ) { // editing a user profile
+			if ( is_super_admin( $profileuser_id ) ) { // trying to edit a superadmin while less than a superadmin
+				return false;
+			} elseif ( ! ( is_user_member_of_blog( $profileuser_id, get_current_blog_id() ) && is_user_member_of_blog( $current_user->ID, get_current_blog_id() ) )) { // editing user and edited user aren't members of the same blog
+				return false;
+			}
+		}
+		return true;
+	}
+		
 	
 }
