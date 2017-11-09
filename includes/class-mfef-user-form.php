@@ -53,7 +53,11 @@ class MFEF_User_Form extends MFEF_Form {
 					$this->wp_user_fields[ $key] = $value;
 				}
 				foreach ( $meta as $key => $value ) {
-					$this->values[ $key ] = $value[0];
+					if ( count($value) == 1 ) {
+						$this->values[ $key ] = $value[0];
+					} else {
+						$this->values[ $key ] = $value;
+					}
 				}
 				//print_r($data);
 				

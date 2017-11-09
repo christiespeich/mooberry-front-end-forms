@@ -2,7 +2,7 @@
 	color: red;
 }
 
-.required label::before {
+.required > label::before {
 	content: ' * ';
 	color: red;
 }
@@ -55,11 +55,19 @@ div.mfef-field-checkbox ul li label {
 	padding-left: 0;
 }
 
+div.mfef-field {
+	clear: both;
+}
+
 .mfef-field.mfef-field-repeater label {
     width: 26%;
 }
 
 .mfef-field.mfef-field-hidden > label {
     width: initial;
+}
+
+.mfef-field.mfef-field-hidden {
+	display:none;
 }
 

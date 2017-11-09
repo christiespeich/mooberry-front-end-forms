@@ -37,6 +37,9 @@ class MFEF_Field_Factory {
 			case 'wysiwyg':
 				$field = new MFEF_WYSIWYG_Field( $options );
 				break;
+			case 'taxonomy':
+				$field = new MFEF_Taxonomy_Checkbox_Field( $options );
+				break;
 			
 		}
 		return $field;

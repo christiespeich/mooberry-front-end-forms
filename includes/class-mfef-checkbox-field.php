@@ -17,6 +17,7 @@ class MFEF_Checkbox_Field extends MFEF_Single_Field {
 		
 		$this->options = $field_options['options'];
 		
+		$this->value = maybe_unserialize($this->value);
 		if ( !is_array($this->value ) ) {
 			$this->value = array( $this->value );
 		}
@@ -26,14 +27,13 @@ class MFEF_Checkbox_Field extends MFEF_Single_Field {
 	
 	protected function render_field() {
 		
-		$required = ( $this->required ) ? ' required="required" ' : '';
+		//$required = ( $this->required ) ? ' required="required" ' : '';
 		?><ul><?php
 		foreach ( $this->options as $key => $value ) {
-			
 			$checked = ( in_array($key, $this->value) ) ? ' checked="checked" ' : '';
 		?>
 		<li>
-			<input type="checkbox" value="<?php echo esc_attr($key); ?>" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($this->id); ?>[]" class="<?php echo implode(' ', $this->classes); ?> mfef-checkbox-option mfef-checkbox-option-<?php echo esc_attr($key); ?>" <?php echo $required . $checked; ?> />
+			<input type="checkbox" value="<?php echo esc_attr($key); ?>" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($this->id); ?>[]" class="<?php echo implode(' ', $this->classes); ?> mfef-checkbox-option mfef-checkbox-option-<?php echo esc_attr($key); ?>" <?php echo  $checked; ?> />
 			<label for="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></label>
 		</li>
 		<?php

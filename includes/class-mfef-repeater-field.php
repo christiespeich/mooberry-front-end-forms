@@ -93,7 +93,7 @@ class MFEF_Repeater_Field extends MFEF_Field {
 	}
 	
 	public function sanitize( $values ) {
-	print_r2('saniztize repeart');
+	
 		$sanitized_values = array();
 		foreach ( $values as $row ) {
 			$sanitized_fields = array();

@@ -51,6 +51,7 @@ require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-text-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-wysiwyg-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-select-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-checkbox-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-taxonomy-checkbox-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-textarea-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-radio-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-repeater-field.php';

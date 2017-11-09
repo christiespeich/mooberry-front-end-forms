@@ -74,10 +74,8 @@ abstract class MFEF_Form {
 	public function add_field( $field_options ) {
 		$access = $this->check_capability();
 		 if ( $access ) {
-			 
 			if ( array_key_exists( $field_options['id'], $this->values ) ) {
 				$field_options['value']  = $this->values[ $field_options['id'] ];
-				
 			}
 			$new_field = MFEF_Field_Factory::create_field( $field_options );
 			

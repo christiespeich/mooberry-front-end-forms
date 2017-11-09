@@ -22,11 +22,14 @@ abstract class MFEF_Single_Field extends MFEF_Field {
 		
 		$field_options = array_merge( $defaults, $field_options );
 		
-		
 		$this->type = $field_options['type'];
 		$this->required = $field_options['required'];
 		$this->default	= $field_options['default'];
-		$this->value = $field_options['value'];
+		if ( $this->load_callback == '' ) {
+			$this->value = $field_options['value'];
+		} else {
+			$this->value = call_user_func( $this->load_callback, $this );
+		}
 		$this->validation_callback = $field_options['validation_callback'];
 		$this->empty_value = $field_options['empty_value'];
 		
@@ -43,8 +46,11 @@ abstract class MFEF_Single_Field extends MFEF_Field {
 	public function validate() {
 		// if not required, always return true
 		// if required, return true if it's not blank
-		
-		$valid =  ( !$this->required || trim( $this->value ) != $this->empty_value );
+		if ( is_array( $this->value ) ) {
+			$valid = count($this->value) > 0;
+		} else {
+			$valid =  ( !$this->required || trim( $this->value ) != $this->empty_value );
+		}
 		if ( !$valid ) {
 			$this->classes[] = 'missing';
 			return new WP_Error( 'missing-field', $this->label . ' is required.', $this->label);

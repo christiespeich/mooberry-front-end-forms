@@ -6,6 +6,7 @@ abstract class MFEF_Field {
 	protected $type;
 	protected $classes;
 	protected $description;
+	protected $load_callback;
 	/* protected $options;
 	protected $required;
 	protected $default;
@@ -20,6 +21,7 @@ abstract class MFEF_Field {
 			'label'	=>	'',
 			'classes'	=>	array(),
 			'desc'	=>	'',
+			'load_callback'	=>	'',
 		);
 		
 		$field_options = array_merge( $defaults, $field_options );
@@ -34,6 +36,7 @@ abstract class MFEF_Field {
 		$this->type = $field_options['type'];
 		$this->classes = $field_options['classes'];
 		$this->description = $field_options['desc'];
+		$this->load_callback = $field_options['load_callback'];
 		
 		$this->classes[] = 'mfef-field';
 		$this->classes[] = 'mfef-field-' . esc_attr($this->id);
