@@ -40,6 +40,9 @@ class MFEF_Field_Factory {
 			case 'taxonomy':
 				$field = new MFEF_Taxonomy_Checkbox_Field( $options );
 				break;
+			case 'featured-thumbnail':
+				$field = new MFEF_Featured_Thumbnail_Field( $options );
+				break;
 			
 		}
 		return $field;

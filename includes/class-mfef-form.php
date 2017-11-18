@@ -18,13 +18,17 @@ abstract class MFEF_Form {
 	protected $button_text;
 	protected $button_classes;
 	protected $save_callback;
+	protected $redirect_after_cancel;
+	protected $allow_delete;
 		
 		
 	abstract protected function save_fields( $fields );
+	abstract protected function delete();
 	
 	 public function __construct( $id, $options = null, $capability = null) {
 		 
 		 $this->capability = $capability;
+
 		 $access = $this->check_capability();
 		 if ( !$access ) {
 			 
@@ -36,13 +40,15 @@ abstract class MFEF_Form {
 		 
 		$defaults = array(
 			'redirect_after_save'	=>	'',
+			'redirect_after_cancel'	=>	'',
 			'nonce_field'	=>	$id,
 			'nonce_value'	=>	$id . '-front-end',
-			'button_name'	=> '',
-			'button_value'	=>	'',
+			'button_name'	=> 'mfef_btn_save',
+			'button_value'	=>	'save',
 			'button_text'	=>	__('Save', 'mooberry-front-end-forms'),
 			'button_classes'	=>	array(),
 			'save_callback'	=>	'',
+            'allow_delete'  =>  false,
 		);
 		
 		$options = array_merge( $defaults, $options );
@@ -55,14 +61,19 @@ abstract class MFEF_Form {
 		$this->button_text	= $options['button_text'];
 		$this->button_classes = $options['button_classes'];
 		$this->save_callback = $options['save_callback'];
+		$this->allow_delete = $options['allow_delete'];
 		
 		$this->redirect_after_save = $options['redirect_after_save'];
-		
-		
+		if ( $options['redirect_after_cancel'] == '' ) {
+			$this->redirect_after_cancel = $this->redirect_after_save;
+		} else {
+			$this->redirect_after_cancel = $options['redirect_after_cancel'];
+		}
 		
 	} 
 	
 	protected function check_capability() {
+
 		if ( $this->capability != null ) {
 			return current_user_can( $this->capability, $this->item_id );
 		} else {
@@ -103,7 +114,7 @@ abstract class MFEF_Form {
 			}
 		
 			?>
-			<form id="<?php echo esc_attr($this->id); ?>" class="<?php echo esc_attr($this->class); ?> mfef-form mfef-form-<?php echo esc_attr($this->id); ?>" action="" method="post">
+			<form id="<?php echo esc_attr($this->id); ?>" class="<?php echo esc_attr($this->class); ?> mfef-form mfef-form-<?php echo esc_attr($this->id); ?>" action="" method="post"  enctype="multipart/form-data">
 				<?php
 				foreach ( $this->fields as $field ) {
 					/* $value = null;
@@ -113,10 +124,17 @@ abstract class MFEF_Form {
 					$field->render(  );
 				}
 			
-				 wp_nonce_field( $this->nonce_field , $this->nonce_value); 
+				 wp_nonce_field( $this->nonce_field , $this->nonce_value);
+				do_action( 'mfef_before_save_button');
 					?>
-				
-				<button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html($this->button_text); ?></button>	
+				<div id="mfef_button_block">
+                    <button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next mfef-btn-save <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html($this->button_text); ?></button>
+                    <?php
+                        do_action( 'mfef_after_save_button');
+                    ?>
+                    <button type="submit" value="cancel" id="mfef_btn_cancel" name="mfef_btn_cancel" class="btn btn-primary btn-large button-next mfef-btn-cancel <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html(__('Cancel', 'mooberry-front-end-forms') ); ?></button>
+                    <button type="submit" value="delete" id="mfef_btn_delete" name="mfef_btn_cancel" class="btn btn-danger btn-large button-next mfef-btn-delete <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html(__('Delete', 'mooberry-front-end-forms') ); ?></button>
+                </div>
 			</form>
 			<?php
 		 }
@@ -137,9 +155,16 @@ abstract class MFEF_Form {
 		 if ( $access ) {
 			 
 			if (isset($_POST[$this->nonce_value]) ) {
-				if (wp_verify_nonce($_POST[ $this->nonce_value], $this->nonce_field)){ 
-					// save form
-					
+				if (wp_verify_nonce($_POST[ $this->nonce_value], $this->nonce_field)){
+					if ( isset($_POST['mfef_btn_cancel']) ) {
+					    wp_safe_redirect( $this->redirect_after_cancel );
+					    exit;
+					}
+					if ( isset($_POST['mfef_btn_delete']) ) {
+						$this->delete();
+						return;
+					}
+				    // save form
 					$clean_fields = array();
 					$message = array();
 					foreach ( $this->fields as $field ) {

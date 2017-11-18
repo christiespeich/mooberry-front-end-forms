@@ -32,8 +32,9 @@
 
 .mfef-form button[type="submit"] {
     margin-top: 20px;
+	margin-right: 10px;
 	float: none;
-	display: block;
+/*	display: block;*/
 	clear: both;
 }
 
@@ -71,3 +72,23 @@ div.mfef-field {
 	display:none;
 }
 
+#mfef_thumbnail_preview span {
+	display: inline-block;
+	float: right;
+	margin: -10px -10px 0 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: red;
+}
+
+#mfef_thumbnail_preview {
+	display: inline-block;
+	width: 100px;
+	height: 100px;
+	position: relative;
+}
+
+#mfef_button_block {
+	clear: both;
+}

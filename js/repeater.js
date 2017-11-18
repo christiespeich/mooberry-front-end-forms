@@ -27,5 +27,12 @@ jQuery(document).ready(function () {
 				jQuery(this).slideUp(deleteElement);
 			}
 		}
-	})
+	});
+
+    jQuery('#mfef_btn_cancel').bind('click', confirm_cancel);
+
 });
+
+function confirm_cancel() {
+    return confirm( 'Are you sure you want to cancel?' );
+}

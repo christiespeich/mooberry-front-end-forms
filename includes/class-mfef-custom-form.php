@@ -4,6 +4,7 @@ class MFEF_Custom_Form extends MFEF_Form {
 	
 	protected $save_callback;
 	protected $load_callback;
+	protected $delete_callback;
 
 	
 	
@@ -13,6 +14,7 @@ class MFEF_Custom_Form extends MFEF_Form {
 		
 		$defaults = array( 'save_callback'	=>	'',
 							'load_callback'	=>	'',
+							'delete_callback'   =>  '',
 							'item_id'	=>	'',
 						);
 						
@@ -20,6 +22,7 @@ class MFEF_Custom_Form extends MFEF_Form {
 		
 		$this->load_callback = $options['load_callback'];
 		$this->save_callback = $options['save_callback'];
+		$this->delete_callback = $options['delete_callback'];
 		$this->item_id = $options['item_id'];
 		
 		
@@ -36,6 +39,12 @@ class MFEF_Custom_Form extends MFEF_Form {
 	protected function save_fields( $fields ) {
 		if ( $this->save_callback != '' && function_exists( $this->save_callback ) ) {
 			return call_user_func( $this->save_callback, $fields );
+		}
+	}
+
+	protected function delete() {
+		if ( $this->delete_callback != '' && function_exists( $this->delete_callback ) ) {
+			return call_user_func( $this->delete_callback, $this->item_id );
 		}
 	}
 	

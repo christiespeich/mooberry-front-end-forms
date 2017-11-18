@@ -20,7 +20,13 @@ class MFEF_Option_Form extends MFEF_Form {
 	protected function save_fields( $fields ) {
 			return update_option( $this->options_key, $fields );	
 	}
-	
+
+	protected function delete() {
+		if ( current_user_can('manage_options') ) {
+			delete_option( $this->options_key );
+		}
+
+	}
 	
 	
 }

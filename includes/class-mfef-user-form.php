@@ -3,24 +3,33 @@
 class MFEF_User_Form extends MFEF_Form {
 	
 	protected $wp_user_fields;
-	
+
 	public function __construct ( $id, $options = null, $capability = 'edit_users' ) {
 		
 		// item_id must be set before parent__contruct();
 		$defaults = array(
-				'user_id'	=>	'0'
-				);
+				'user_id'	=>	'0',
+				'allow_save_as_draft'   =>  false,
+		);
+
 		$options = array_merge( $defaults, $options );
 		
 		$this->item_id = $options['user_id'];
+
+		// if editing self, then capability = read
+		if ( $this->item_id == get_current_user_id() ) {
+			$capability = 'read';
+		}
 		
 		$access = $this->edit_permission_check( $this->item_id );
+
 		if ( !$access ) {
 			echo
 					'<h3>' . __( 'Access Denied' ) . '</h3>' .
 					'<p>' . __( 'Sorry, you do not have access to edit this user.', 'mooberry-front-end-forms' ) . '</p>';
 			return;
 		}
+
 		parent::__construct( $id, $options, $capability);
 		
 		$this->wp_user_fields = array();
@@ -142,8 +151,20 @@ class MFEF_User_Form extends MFEF_Form {
 			return true;
 		
 	}
-	
-	
+
+	protected function check_capability() {
+		if ( $this->item_id == 0 ) {
+			return current_user_can( 'create_users' );
+		}
+
+		if ( $this->capability != null && $this->item_id != 0 ) {
+			return current_user_can( $this->capability, $this->item_id );
+		} else {
+			return true;
+		}
+	}
+
+
 	protected function edit_permission_check( $profileuser_id) {
 		// global $current_user, $profileuser;
 	  
@@ -151,7 +172,8 @@ class MFEF_User_Form extends MFEF_Form {
 	   
 		$current_user = wp_get_current_user();
 	   // get_currentuserinfo();
-	 
+
+
 		if( ! is_super_admin( $current_user->ID )  ) { // editing a user profile
 			if ( is_super_admin( $profileuser_id ) ) { // trying to edit a superadmin while less than a superadmin
 				return false;
@@ -161,6 +183,12 @@ class MFEF_User_Form extends MFEF_Form {
 		}
 		return true;
 	}
-		
+
+	protected function delete() {
+		if ( current_user_can( 'delete_users' ) ) {
+
+			wp_delete_user( $this->item_id );
+		}
+	}
 	
 }

@@ -56,12 +56,15 @@ require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-textarea-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-radio-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-repeater-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-hidden-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-password-field.php';
+require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-featured-thumbnail-field.php';
 
 add_action( 'wp_enqueue_scripts', 'mfef_enqueue_scripts' );
 add_action( 'login_enqueue_scripts', 'mfef_enqueue_scripts');
 function mfef_enqueue_scripts() {
 	wp_enqueue_script( 'jquery-repeater', MFEF_PLUGIN_URL . '/js/jquery.repeater/jquery.repeater.js', array( 'jquery' ), MFEF_PLUGIN_VERSION,true );
 	wp_enqueue_script( 'repeater', MFEF_PLUGIN_URL . '/js/repeater.js', array( 'jquery' ),MFEF_PLUGIN_VERSION,true );
+	wp_enqueue_script( 'file-upload', MFEF_PLUGIN_URL . '/js/file-upload.js', array( 'jquery' ),MFEF_PLUGIN_VERSION,true );
 	
 	wp_enqueue_style( 'mfef', MFEF_PLUGIN_URL . '/css/style.css' );
 }
