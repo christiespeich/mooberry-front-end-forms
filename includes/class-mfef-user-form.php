@@ -91,7 +91,7 @@ class MFEF_User_Form extends MFEF_Form {
 				echo
 						'<h3>' . __( 'Access Denied' ) . '</h3>' .
 						'<p>' . __( 'Sorry, you do not have access to edit this user.', 'mooberry-front-end-forms' ) . '</p>';
-				return;
+				return false;
 			}
 				
 			if (  $this->item_id == '0' ) {
@@ -148,7 +148,7 @@ class MFEF_User_Form extends MFEF_Form {
 				}
 			}
 			
-			return true;
+			return $this->item_id;
 		
 	}
 

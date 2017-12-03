@@ -104,7 +104,8 @@ class MFEF_Post_Form extends MFEF_Form {
 			}
 
 
-			return true;
+			//return true;
+        return $new_post_id;
 	}
 
 	protected function upload_featured_thumbnail( $post_id ) {

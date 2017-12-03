@@ -242,6 +242,9 @@ abstract class MFEF_Form {
 		if ( $this->check_capability() ) {
 			do_action('mfef_pre_save', $this, $fields );
 			$success = $this->save_fields( $fields );
+			if ( $success !== false ) {
+				$this->item_id  = $success;
+			}
 			do_action('mfef_post_save_pre_callback', $this, $fields );
 			if ( $this->save_callback != ''  ) {
 				if ( is_callable( $this->save_callback) ) {
