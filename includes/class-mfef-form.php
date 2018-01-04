@@ -19,7 +19,9 @@ abstract class MFEF_Form {
 	protected $button_classes;
 	protected $save_callback;
 	protected $redirect_after_cancel;
+	protected $redirect_after_delete;
 	protected $allow_delete;
+	protected $message;
 		
 		
 	abstract protected function save_fields( $fields );
@@ -41,6 +43,7 @@ abstract class MFEF_Form {
 		$defaults = array(
 			'redirect_after_save'	=>	'',
 			'redirect_after_cancel'	=>	'',
+			'redirect_after_delete'	=>	'',
 			'nonce_field'	=>	$id,
 			'nonce_value'	=>	$id . '-front-end',
 			'button_name'	=> 'mfef_btn_save',
@@ -54,6 +57,7 @@ abstract class MFEF_Form {
 		$options = array_merge( $defaults, $options );
 		
 		$this->id = $id;
+		$this->message = array();
 		$this->nonce_field = $options['nonce_field'];
 		$this->nonce_value = $options['nonce_value'];
 		$this->button_name = $options['button_name'];
@@ -62,12 +66,18 @@ abstract class MFEF_Form {
 		$this->button_classes = $options['button_classes'];
 		$this->save_callback = $options['save_callback'];
 		$this->allow_delete = $options['allow_delete'];
-		
+
+
 		$this->redirect_after_save = $options['redirect_after_save'];
 		if ( $options['redirect_after_cancel'] == '' ) {
 			$this->redirect_after_cancel = $this->redirect_after_save;
 		} else {
 			$this->redirect_after_cancel = $options['redirect_after_cancel'];
+		}
+		if ( $options['redirect_after_delete'] == '' ) {
+			$this->redirect_after_delete = $this->redirect_after_save;
+		} else {
+			$this->redirect_after_delete = $options['redirect_after_delete'];
 		}
 		
 	} 
@@ -132,8 +142,8 @@ abstract class MFEF_Form {
                     <?php
                         do_action( 'mfef_after_save_button');
                     ?>
-                    <button type="submit" value="cancel" id="mfef_btn_cancel" name="mfef_btn_cancel" class="btn btn-primary btn-large button-next mfef-btn-cancel <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html(__('Cancel', 'mooberry-front-end-forms') ); ?></button>
-                    <button type="submit" value="delete" id="mfef_btn_delete" name="mfef_btn_cancel" class="btn btn-danger btn-large button-next mfef-btn-delete <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html(__('Delete', 'mooberry-front-end-forms') ); ?></button>
+                    <button type="submit" value="cancel" id="mfef_btn_cancel" name="mfef_btn_cancel" class="btn btn-primary btn-large button-next mfef-btn-cancel <?php echo implode(' ', $this->button_classes); ?>" formnovalidate><?php echo esc_html(__('Cancel', 'mooberry-front-end-forms') ); ?></button>
+                    <button type="submit" value="delete" id="mfef_btn_delete" name="mfef_btn_delete" class="btn btn-danger btn-large button-next mfef-btn-delete <?php echo implode(' ', $this->button_classes); ?>" onclick="return confirm('Are you sure to delete?');" formnovalidate><?php echo esc_html(__('Delete', 'mooberry-front-end-forms') ); ?></button>
                 </div>
 			</form>
 			<?php
@@ -162,11 +172,13 @@ abstract class MFEF_Form {
 					}
 					if ( isset($_POST['mfef_btn_delete']) ) {
 						$this->delete();
+						 wp_safe_redirect( $this->redirect_after_delete );
 						return;
 					}
+					do_action('mfef_form_process_buttons', $this );
 				    // save form
 					$clean_fields = array();
-					$message = array();
+
 					foreach ( $this->fields as $field ) {
 						
 						if ( array_key_exists( $field->id, $_POST ) ) {
@@ -180,14 +192,14 @@ abstract class MFEF_Form {
 							if ( is_wp_error($result) )  {
 								//$field->classes[] = 'missing';
 								
-									$message[] = $result->get_error_message();
+									$this->message[] = $result->get_error_message();
 								
 							}
 						
 						}
 					}
 					
-					if ( count($message) == 0 ) {
+					if ( count($this->message) == 0 ) {
 						// save the form
 						$success = $this->save( $clean_fields );
 						//$options = $this->sanitize_fields( $this->fields, $_POST );
@@ -197,7 +209,7 @@ abstract class MFEF_Form {
 					//	$this->values = $clean_fields;
 						
 					} else {
-						echo '<p>' . implode('</p><p>', $message) . '</p>';
+						echo '<p>' . implode('</p><p>', $this->message) . '</p>';
 					}
 				} else {
 					echo 'Update Failed!';
@@ -245,12 +257,17 @@ abstract class MFEF_Form {
 			if ( $success !== false ) {
 				$this->item_id  = $success;
 			}
+			$callback_success = true;
 			do_action('mfef_post_save_pre_callback', $this, $fields );
 			if ( $this->save_callback != ''  ) {
 				if ( is_callable( $this->save_callback) ) {
-					call_user_func ( $this->save_callback,  $this, $fields  );
+					$callback_success = call_user_func ( $this->save_callback,  $this, $fields  );
+					if ( $callback_success == null ) {
+						$callback_success = true;
+					}
 				}
 			}
+			$success = $success && $callback_success;
 			do_action('mfef_post_save_post_callback', $this, $fields );
 			if ( $success &&  $this->redirect_after_save != '' ) {
 				do_action('mfef_post_save_pre_redirect', $this, $fields);

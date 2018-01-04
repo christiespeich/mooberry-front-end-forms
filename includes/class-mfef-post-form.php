@@ -54,6 +54,7 @@ class MFEF_Post_Form extends MFEF_Form {
 
 		if ( $this->allow_save_as_draft ) {
 			add_action( 'mfef_after_save_button', array( $this, 'add_draft_button' ));
+			add_action( 'mfef_form_process_buttons', array( $this, 'process_draft_button' ) );
 		}
 	}
 	
@@ -144,8 +145,35 @@ class MFEF_Post_Form extends MFEF_Form {
 
 	public function add_draft_button() {
 		?>
-		<button type="submit" name="mfef_btn_save_draft" value="draft" class="btn btn-primary btn-large button-next mfef-btn mfef-btn-save-draft"><?php echo esc_html( __('Save Draft', 'mooberry-front-end-forms') ); ?></button>
+		<button type="submit" name="mfef_btn_save_draft" value="draft" class="btn btn-primary btn-large button-next mfef-btn mfef-btn-save-draft" formnovalidate><?php echo esc_html( __('Save Draft', 'mooberry-front-end-forms') ); ?></button>
 <?php
+
+    }
+
+    public function process_draft_button( $form ) {
+	    // at least title or content or excerpt has to be filled in, otherwise
+	    // skip validation on all fields for a draft
+
+        $title = isset( $_POST[ 'post_title' ] ) ? sanitize_title($_POST['post_title']) : '';
+        $content = isset( $_POST[ 'post_content' ] ) ? sanitize_text_field($_POST['post_content']) : '';
+        $excerpt = isset( $_POST[ 'post_excerpt' ] ) ? sanitize_text_field($_POST['post_excerpt']) : '';
+
+        if ( $title == '' && $content == '' && $excerpt == '' ) {
+	        $this->message[] = __( 'At least title, content, or excerpt is required to save a draft.', 'mooberry-front-end-forms' );
+        }
+
+        foreach ( $form->fields as $field ) {
+            if ( in_array('MFEF_Single_Field' , class_parents($field) ) ) {
+	            $field->required            = false;
+	            $field->validation_callback = '';
+            } else {
+	            foreach ( $field->fields as $repeater_field ) {
+		            $repeater_field->required            = false;
+		            $repeater_field->validation_callback = '';
+	            }
+            }
+
+        }
 
     }
 	
