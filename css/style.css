@@ -92,3 +92,11 @@ div.mfef-field {
 #mfef_button_block {
 	clear: both;
 }
+
+.mfef-show-inline {
+	display: inline;
+}
+
+.mfef-show-block {
+	display: block;
+}

@@ -49,6 +49,7 @@ class MFEF_Repeater_Field extends MFEF_Field {
 	
 	protected function render_field() {
 			?>
+
 	  <div data-repeater-list="<?php echo esc_attr($this->id); ?>" class="<?php echo implode(' ', $this->classes); ?>">
 	  <?php 
 	  
@@ -66,8 +67,9 @@ class MFEF_Repeater_Field extends MFEF_Field {
 		  if ( !is_array( $row ) ) {
 			  $row = array( $row );
 		  }
-		  
+		  do_action('mfef-before-repeater-item', $this, $counter );
 		  echo '<div data-repeater-item class="repeater-item"> ';
+		   do_action('mfef-before-first-repeater-field', $this, $counter );
 		  $counter++;
 		  
 		  foreach ( $this->fields as $field ) { 		  
@@ -78,9 +80,12 @@ class MFEF_Repeater_Field extends MFEF_Field {
 				
 				$field->render( );
 		  }
+		    do_action('mfef-after-last-repeater-field', $this, $counter );
 				?>
 				<input data-repeater-delete type="button" class="repeater-delete-button repeater-delete-button-<?php echo esc_attr($this->id); ?>"/>
-				
+          <?php
+          do_action( 'mfef-after-repeater-delete-button', $this, $counter );
+          ?>
 				
 			  </div>
 		  <?php 
@@ -88,7 +93,9 @@ class MFEF_Repeater_Field extends MFEF_Field {
 	  
 	  ?>
 		</div>
+
 		<input data-repeater-create type="button" value="<?php echo esc_attr($this->add_text); ?>" class="btn btn-primary btn-sm repeater-add-button repeater-add-button-<?php echo esc_attr($this->id); ?> <?php echo implode(' ', $this->add_button_classes); ?>"/>
+
 		<?php
 	}
 	

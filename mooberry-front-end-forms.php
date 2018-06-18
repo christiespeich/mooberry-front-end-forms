@@ -60,7 +60,7 @@ require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-password-field.php';
 require_once MFEF_PLUGIN_DIR . '/includes/class-mfef-featured-thumbnail-field.php';
 
 add_action( 'wp_enqueue_scripts', 'mfef_enqueue_scripts' );
-add_action( 'login_enqueue_scripts', 'mfef_enqueue_scripts');
+add_action( 'admin_enqueue_scripts', 'mfef_enqueue_scripts');
 function mfef_enqueue_scripts() {
 	wp_enqueue_script( 'jquery-repeater', MFEF_PLUGIN_URL . '/js/jquery.repeater/jquery.repeater.js', array( 'jquery' ), MFEF_PLUGIN_VERSION,true );
 	wp_enqueue_script( 'repeater', MFEF_PLUGIN_URL . '/js/repeater.js', array( 'jquery' ),MFEF_PLUGIN_VERSION,true );
@@ -73,7 +73,7 @@ function mfef_enqueue_scripts() {
 
 function mfef_get_unique_id() {
 
-	return uniqid('', true);
+	return uniqid(mt_rand(100,999), false);
 		
 }
 

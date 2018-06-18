@@ -21,6 +21,7 @@ abstract class MFEF_Form {
 	protected $redirect_after_cancel;
 	protected $redirect_after_delete;
 	protected $allow_delete;
+	protected $allow_cancel;
 	protected $message;
 		
 		
@@ -52,6 +53,7 @@ abstract class MFEF_Form {
 			'button_classes'	=>	array(),
 			'save_callback'	=>	'',
             'allow_delete'  =>  false,
+            'allow_cancel'  =>  true,
 		);
 		
 		$options = array_merge( $defaults, $options );
@@ -138,12 +140,35 @@ abstract class MFEF_Form {
 				do_action( 'mfef_before_save_button');
 					?>
 				<div id="mfef_button_block">
-                    <button type="submit" value="<?php echo esc_attr($this->button_value); ?>" name="<?php echo esc_attr($this->button_name); ?>" class="btn btn-primary btn-large button-next mfef-btn-save <?php echo implode(' ', $this->button_classes); ?>"><?php echo esc_html($this->button_text); ?></button>
                     <?php
+               //     if ( is_admin() ) {
+	           //         echo submit_button();
+                //    } else {
+	                    ?>
+                        <button type="submit" value="<?php echo esc_attr( $this->button_value ); ?>"
+                                name="<?php echo esc_attr( $this->button_name ); ?>"
+                                class="btn btn-primary btn-large button-next mfef-btn-save <?php echo implode( ' ', $this->button_classes ); ?>"><?php echo esc_html( $this->button_text ); ?></button>
+	                    <?php
+                //    }
                         do_action( 'mfef_after_save_button');
-                    ?>
-                    <button type="submit" value="cancel" id="mfef_btn_cancel" name="mfef_btn_cancel" class="btn btn-primary btn-large button-next mfef-btn-cancel <?php echo implode(' ', $this->button_classes); ?>" formnovalidate><?php echo esc_html(__('Cancel', 'mooberry-front-end-forms') ); ?></button>
-                    <button type="submit" value="delete" id="mfef_btn_delete" name="mfef_btn_delete" class="btn btn-danger btn-large button-next mfef-btn-delete <?php echo implode(' ', $this->button_classes); ?>" onclick="return confirm('Are you sure to delete?');" formnovalidate><?php echo esc_html(__('Delete', 'mooberry-front-end-forms') ); ?></button>
+                    if ( $this->allow_cancel ) {
+	                    ?>
+                        <button type="submit" value="cancel" id="mfef_btn_cancel" name="mfef_btn_cancel"
+                                class="btn btn-primary btn-large button-next mfef-btn-cancel <?php echo implode( ' ', $this->button_classes ); ?>"
+                                formnovalidate><?php echo esc_html( __( 'Cancel', 'mooberry-front-end-forms' ) ); ?></button>
+	                    <?php
+                        do_action('mfef_after_cancel_button');
+                    }
+                    if ( $this->allow_delete ) {
+	                    ?>
+                        <button type="submit" value="delete" id="mfef_btn_delete" name="mfef_btn_delete"
+                                class="btn btn-danger btn-large button-next mfef-btn-delete <?php echo implode( ' ', $this->button_classes ); ?>"
+                                onclick="return confirm('Are you sure to delete?');"
+                                formnovalidate><?php echo esc_html( __( 'Delete', 'mooberry-front-end-forms' ) ); ?></button>
+	                    <?php
+                        do_action( 'mfef_after_delete_button');
+                    }
+                        ?>
                 </div>
 			</form>
 			<?php
@@ -201,7 +226,11 @@ abstract class MFEF_Form {
 					
 					if ( count($this->message) == 0 ) {
 						// save the form
-						$success = $this->save( $clean_fields );
+                        $success = $this->save( $clean_fields );
+
+                        if ( $success ) {
+	                        echo '<p>Successfully saved</p>';
+                        }
 						//$options = $this->sanitize_fields( $this->fields, $_POST );
 						
 						
@@ -275,6 +304,7 @@ abstract class MFEF_Form {
 				exit();
 			}
 		}
+		return $success;
 	}
 	
 

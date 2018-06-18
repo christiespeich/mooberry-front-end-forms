@@ -1,5 +1,6 @@
 jQuery(document).ready(function () {
-	jQuery('.repeater').repeater({
+
+	jQuery('form.repeater').repeater({
 		// (Optional)
 		// "defaultValues" sets the values of added items.  The keys of
 		// defaultValues refer to the value of the input's name attribute.
@@ -26,7 +27,12 @@ jQuery(document).ready(function () {
 			if(confirm('Are you sure you want to delete this element?')) {
 				jQuery(this).slideUp(deleteElement);
 			}
-		}
+		},
+		repeaters: [{
+            // (Required)
+            // Specify the jQuery selector for this nested repeater
+            selector: '.repeater-item div.mfef-field-repeater:not([data-repeater-list])'
+        }]
 	});
 
     jQuery('#mfef_btn_cancel').bind('click', confirm_cancel);
